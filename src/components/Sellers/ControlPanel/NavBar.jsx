@@ -12,7 +12,7 @@ export const SellersControlPanelNavBar = ({ list = [] }) => {
                         ? 'text-on-primary-container bg-[#574500]'
                         : isPending
                             ? ''
-                            : 'hover:bg-surface-container bg-surface-container-low') + ' flex px-3 py-2 rounded-full'
+                            : 'hover:bg-surface-container bg-surface-container-low') + ' flex px-3 py-2 rounded-2xl'
                 }
             >
                 {schedule.name}

@@ -52,7 +52,7 @@ export const NavigationDrawer = ({ sellers, schedule }) => {
                     <NavLinkItem
                         iconName='format_list_numbered_rtl'
                         label='Números'
-                        link='numeros'
+                        link={`numeros/turno/${scheduleId ? scheduleId : 1}`}
                     />
                     <NavLinkItem
                         iconName='overview'

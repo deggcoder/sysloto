@@ -13,3 +13,4 @@ export * from './MenuFloatingButton';
 export * from './Menu';
 export * from './UserFloatingButton';
 export * from './MenuList';
+export * from './SearchPanel';

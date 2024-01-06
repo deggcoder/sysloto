@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Form, useLoaderData, useSubmit } from "react-router-dom";
+import { Form, useSubmit } from "react-router-dom";
 
-export const SellersControlPanelSearch = ({ q, title='Title' }) => {
+export const SearchPanel = ({ q, title='Title' }) => {
     const [visible, setVisible] = useState(false);
     const submit = useSubmit();
 

@@ -1,21 +1,21 @@
 import { IconUser } from "../../UI";
 
-export const NumbersDetailsList = ({ sellersList = [] }) => {
+export const NumbersDetailsList = ({ list = [] }) => {
 
-    const listItems = sellersList.map(seller => (
+    const listItems = list.map(number => (
         <li
-            key={seller.id}
+            key={number.idSeller}
         >
             <div className="flex p-3.5 rounded-2xl bg-surface-container justify-between items-start w-full">
                 <div
                     className="flex justify-between items-center flex-1"
                 >
                     <div className="flex gap-3.5 items-center">
-                        <IconUser userName={seller.name} />
-                        <h5 className="text-title-medium text-on-surface">{seller.name}</h5>
+                        <IconUser userName={number.seller} />
+                        <h5 className="text-title-medium text-on-surface">{number.seller}</h5>
                     </div>
                     <h5 className="text-title-medium text-on-surface">
-                        C$ {seller.total}
+                        C$ {number.price}
                     </h5>
                 </div>
             </div>
