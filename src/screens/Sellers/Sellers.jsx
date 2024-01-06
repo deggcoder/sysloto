@@ -38,7 +38,7 @@ export async function salesAction({ params }) {
 }
 
 export const ScreensSellers = () => {
-    const { response, schedules } = useLoaderData();
+    const { response, schedules, q } = useLoaderData();
 
     const {sellerId, scheduleId} = useParams();
 
@@ -55,7 +55,10 @@ export const ScreensSellers = () => {
                     <menu
                         className="flex justify-between text-on-surface-variant pt-1 pl-1.5 pr-1.5"
                     >
-                        <SellersControlPanelSearch />
+                        <SellersControlPanelSearch
+                            q={q}
+                            title='Ventas'
+                        />
 
                         <div className='flex'>
                             <Form method='post'>
@@ -85,7 +88,9 @@ export const ScreensSellers = () => {
                 </header>
 
                 {
-                    tickets.length ?
+                    q 
+                        ? null
+                        : tickets.length ?
                         <Navigate to={`/vendedor/${sellerId}/turno/${scheduleId}/ventas/${tickets[0].idTicket}`} replace={true} />
                         : null
                 }

@@ -28,7 +28,11 @@ export const ScreensDisburses = () => {
                 bg-surface rounded-t-2xl min-w-[260px] w-[360px]'
             >
                 <header className='flex justify-between pb-3.5 relative'>
-                    <DisbursesControlPanelSearch />
+                <h3
+                    className='text-headline-medium'
+                >
+                    Desembolsos
+                </h3>
 
                     <div className='flex'>
 

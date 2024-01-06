@@ -3,7 +3,7 @@ import { ScreensRoutesRoot, loadSellers } from "./Routes";
 import ScreensErrorPage from "./Error/ErrorPage";
 import { ScreensPanel } from "./Panel";
 import { PanelSalesDashboard, action as rootAction } from "../components";
-import { ScreensNumbers } from "./Numbers";
+import { ScreensNumbers, numberDetailLoader, numbersLoader } from "./Numbers";
 import { ScreensNumbersDetails } from "./Numbers";
 import { ScreensDisburses, disbursesLoader } from "./Disburses/Disburses";
 import { ScreensDisbursesDetails, disbursesDLoader } from "./Disburses/DisbursesDetails";
@@ -37,12 +37,15 @@ export const router = createBrowserRouter([
                 ],
             },
             {
-                path: `numeros`,
+                path: `numeros/turno/:scheduleId`,
                 element: <ScreensNumbers />,
+                loader: numbersLoader,
                 children: [
+                    { index: true, element: <SellerIndex label="Detalle de número" /> },
                     {
-                        path: `:numberId`,
-                        element: <ScreensNumbersDetails />
+                        path: `detalle/:numberId`,
+                        element: <ScreensNumbersDetails />,
+                        loader: numberDetailLoader,
                     },
                 ],
             },
@@ -71,7 +74,7 @@ export const router = createBrowserRouter([
                 loader: salesLoader,
                 action: salesAction,
                 children: [
-                    { index: true, element: <SellerIndex /> },
+                    { index: true, element: <SellerIndex label="Detalle de venta" /> },
                     {
                         path: `:ticketId`,
                         element: <ScreensSellersDetails />,

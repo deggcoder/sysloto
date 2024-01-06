@@ -1,6 +1,10 @@
 import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
+import { getNumbersBySchedule, getTicket, getTickets, isSameDay } from "./sales";
+import { getSeller, getSellers } from "./sellers";
+import { getShiftSchedule } from "./shiftSchedules";
+import { getNumberList } from "./numbers";
 
 export async function getLastId() {
     await fakeNetwork();
@@ -27,9 +31,114 @@ export async function getDetails(idSchedule, idSeller) {
         // sales = matchSorter(sales, query, { keys: ["idSeller", "idShiftSchedule"] });
         sales = sales.filter(ticket => (ticket.idShiftSchedule == idSchedule)
             && (ticket.idSeller == idSeller)
-            && isSameDay(ticket.date, new Date(`${year}-${month}-${day} 00:00:00`)));
+            && isSameDay(ticket.date));
     }
-    return sales.sort(sortBy("date"));
+    return sales.sort(sortBy("number"));
+}
+
+export async function getNumbers(idSchedule, query) {
+    let response = new Object(null);
+    
+    await fakeNetwork(`getNumbers:${idSchedule}`);
+    let sales = await getDetailsBySchedule(idSchedule);
+
+    if (sales.length) {
+        sales = sales.reduce((acc, obj) => {
+            const {idTicket, number, price, factor} = obj;
+            const exists = acc.find(item => item.number == number);
+            if(exists) {
+                exists.price += price;
+                exists.factor += factor;
+            } else {
+                acc.push({idTicket, number, price, factor});
+            }
+            return acc;
+        }, []);
+    }
+
+    const total = sales.reduce((acc, number) => acc + number.price, 0);
+
+    if (query) {
+        sales = matchSorter(sales, query, { keys: ["number"] });
+    }
+
+    response.numbers = sales.sort(sortBy("number"));
+    response.totalSales = total;
+    response.totalNumbers = sales.length;
+
+    return response;
+}
+
+export async function getDetailsBySchedule(idSchedule) {
+    await fakeNetwork(`getDetailsBySchedule:${idSchedule}`);
+    let tickets = await getTickets(idSchedule);
+
+    if (!tickets) tickets = [];
+    if (idSchedule) {
+        tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+            && isSameDay(ticket.date));
+    } else {
+        tickets = tickets.filter(ticket => isSameDay(ticket.date));
+    }
+    
+    const ids = tickets.map(ticket => ticket.idTicket);
+    const sales = await getDetailsByTickets(ids);
+    return sales.sort(sortBy("number"));
+}
+
+export async function getDetailOfNumber(number, idSchedule) {
+    await fakeNetwork(`getDetailOfNumber:${number},${idSchedule}`);
+    let response = new Object(null);
+
+    let numbers = await getNumbersBySchedule(idSchedule, number);
+    const sellers = await getSellers();
+    const schedule = await getShiftSchedule(idSchedule);
+
+    const numberList = await getNumberList();
+    const _number = numberList.find(n => n.number == number);
+    
+    if (numbers.length) {
+        numbers = numbers.reduce((acc, obj) => {
+            const {number, price, factor, idSeller} = obj;
+            const exists = acc.find(item => item.number == number && item.idSeller == idSeller);
+            if(exists) {
+                exists.price += price;
+                exists.factor += factor;
+            } else {
+                acc.push({number, price, factor, idSeller});
+            }
+            return acc;
+        }, []);
+    }
+
+    numbers = numbers.map(n => {
+        let obj = new Object(null);
+        let seller = sellers.find(s => s.idSeller == n.idSeller);
+        if(seller) {
+            obj = {
+                ...n,
+                seller: `${seller.firstName} ${seller.lastName}`,
+            };
+        } else {
+            obj = {
+                ...n,
+            };
+        }
+        return obj;
+    });
+
+    const totalDisburse = numbers.reduce((acc, number) => acc + number.factor, 0);
+    const currentSales = numbers.reduce((acc, number) => acc + number.price, 0);
+
+    response.numbers = numbers;
+    response.number = number;
+    response.schedule = schedule.name;
+    response.totalDisburse = totalDisburse;
+    response.maxLimit = _number.maxLimit;
+    response.range = _number.range;
+    response.currentSales = currentSales;
+
+    return response;
 }
 
 export async function getDetailsByTickets(tickets) {
@@ -76,19 +185,19 @@ export async function getDetailsByNumber(number) {
     return details.sort(sortBy("date"));
 }
 
-export async function getNumbersBySchedule(idSchedule, number, query) {
-    await fakeNetwork(`getNumbersBySchedule:${idSchedule},${number}`);
-    let sales = await localforage.getItem("details");
+// export async function getNumbersBySchedule(idSchedule, number, query) {
+//     await fakeNetwork(`getNumbersBySchedule:${idSchedule},${number}`);
+//     let sales = await localforage.getItem("details");
 
-    if (!sales) sales = [];
-    if (idSchedule && number) {
+//     if (!sales) sales = [];
+//     if (idSchedule && number) {
         
-        sales = sales.filter(n => (n.idShiftSchedule == idSchedule)
-            && (n.number == number)
-            && isSameDay(n.date));
-    }
-    return sales.sort(sortBy("date"));
-}
+//         sales = sales.filter(n => (n.idShiftSchedule == idSchedule)
+//             && (n.number == number)
+//             && isSameDay(n.date));
+//     }
+//     return sales.sort(sortBy("date"));
+// }
 
 export async function getNumbersByTickets(tickets, numbers) {
     await fakeNetwork(`getNumbersByTickets:${tickets}, ${numbers}`);
@@ -123,7 +232,10 @@ export async function getDetailsByTicket(sale_id) {
 export async function createDetail(idTicket, number, price) {
     await fakeNetwork();
 
-    let detail = { idTicket, number, price };
+    const ticket = await getTicket(idTicket);
+    const seller = await getSeller(ticket.idSeller);
+
+    let detail = { idTicket, number, price, factor: seller.factor * price };
     let details = await getAll();
 
     const comparison = (data) => {

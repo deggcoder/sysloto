@@ -18,10 +18,11 @@ export async function getTickets(idSchedule, idSeller, query) {
 
     if (!tickets) tickets = [];
     if (idSchedule && idSeller) {
-        //tickets = matchSorter(tickets, query, { keys: ["idSeller", "idShiftSchedule"] });
-
         tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
             && (ticket.idSeller == idSeller)
+            && isSameDay(ticket.date));
+    } else if(idSchedule) {
+        tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
             && isSameDay(ticket.date));
     }
     return tickets.sort(sortBy("date"));
@@ -50,7 +51,6 @@ export async function getNumbersBySchedule(scheduleId, number, query) {
             // asign seller factor to number
             const newNumber = {
                 ...d,
-                factor: seller.factor,
                 idSeller: seller.idSeller,
             };
 
@@ -107,7 +107,7 @@ export async function getTicketsByScheduleAndNumber(scheduleId, number, query) {
                 seller: `${seller.firstName} ${seller.lastName}`,
                 schedule: schedule.name,
                 sale: number.price,
-                factor: number.price * seller.factor,
+                factor: number.factor,
             };
 
             return newTicket;
@@ -131,9 +131,10 @@ export async function getSalesDetails(sale_id) {
     response.seller = `${seller.firstName} ${seller.lastName}`;
     response.totalNumbers = details.length;
 
-    response.details = details.map(d => {
-        return { ...d, factor: seller.factor * d.price };
-    });
+    // response.details = details.map(d => {
+    //     return { ...d, factor: seller.factor * d.price };
+    // });
+    response.details = details;
 
     return response;
 }
@@ -265,7 +266,7 @@ class Ticket {
 }
 
 // util
-function isSameDay(date) {
+export function isSameDay(date) {
     const currentDate = new Date();
     const targetDate = new Date(date);
 
