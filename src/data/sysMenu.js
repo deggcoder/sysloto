@@ -12,3 +12,8 @@ export const sellerMenu = [
 export const ticketsMenu = [
     {id: 1, label: 'Eliminar', link: '#'},
 ];
+
+export const navigationDSItems = [
+    {idItem: 1, label: "Turnos", useIcon: true, icon: "calendar_clock", link: "turnos"},
+    {idItem: 2, label: "Números", useIcon: true, icon: "format_list_numbered", link: "numeros"},
+];

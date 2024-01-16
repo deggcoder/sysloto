@@ -1,4 +1,5 @@
 import localforage from "localforage";
+import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
 
 export async function getAll() {
@@ -27,6 +28,10 @@ export async function getNumberList(query) {
         await set(numbersDB);
         numbers = await localforage.getItem("numbers");
     }
+
+    if (query) {
+        numbers = matchSorter(numbers, query, { keys: ["number", "maxLimit"] });
+    }
     
     return numbers.sort(sortBy("idNumber"));
 }
@@ -40,14 +45,14 @@ export async function getNumberList(query) {
 //     await set(sellers);
 //     return seller;
 // }
-export async function updateContact(id, updates) {
+export async function updateNumber(id, updates) {
     await fakeNetwork();
-    let contacts = await localforage.getItem("schedules");
-    let contact = contacts.find(contact => contact.id === id);
-    if (!contact) throw new Error("No contact found for", id);
-    Object.assign(contact, updates);
-    await set(contacts);
-    return contact;
+    let numbers = await localforage.getItem("numbers");
+    let number = numbers.find(number => number.idNumber === id);
+    if (!number) throw new Error("No number found for", id);
+    Object.assign(number, updates);
+    await set(numbers);
+    return number;
 }
 
 export async function deleteContact(id) {

@@ -16,6 +16,7 @@ import { IndexPage } from "./index/IndexPage";
 import { deleteAction } from "./Sellers/Delete";
 import { createAction } from "./Disburses/Create";
 import { deleteDisburseAction } from "./Disburses/Delete";
+import { ScreensSetNumbers, ScreensSetSchdules, ScreensSettingsRoot, setNumbersAction, setNumbersLoader, setScheduleAction, setSchedulesLoader } from "./Settigns";
 
 export const router = createBrowserRouter([
     {
@@ -104,6 +105,24 @@ export const router = createBrowserRouter([
             {
                 path: 'ganador',
                 action: createAction,
+            },
+        ],
+    },
+    {
+        path: 'sysloto/u/:idUser/settings',
+        element: <ScreensSettingsRoot />,
+        children: [
+            {
+                path: "turnos",
+                element: <ScreensSetSchdules />,
+                loader: setSchedulesLoader,
+                action: setScheduleAction,
+            },
+            {
+                path: "numeros",
+                element: <ScreensSetNumbers />,
+                loader: setNumbersLoader,
+                action: setNumbersAction,
             },
         ],
     },

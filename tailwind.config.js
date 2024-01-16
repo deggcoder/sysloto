@@ -36,6 +36,8 @@ export default {
         'shadow': '#000',
         'on-primary': '#3D2F00',
         'on-secondary': '#393016',
+        "tertiary-fixed-dim": "#ADCFAE",
+        "on-tertiary-fixed-variant": "#2F4D34",
       },
       fontFamily: {
         display: ['Merriweather Sans', 'sans-serif'],

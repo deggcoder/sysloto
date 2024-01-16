@@ -50,14 +50,14 @@ export async function getShiftSchedule(idShiftSchedule) {
     return schedule ?? null;
 }
 
-export async function updateContact(id, updates) {
+export async function updateSchedule(id, updates) {
     await fakeNetwork();
-    let contacts = await localforage.getItem("schedules");
-    let contact = contacts.find(contact => contact.id === id);
-    if (!contact) throw new Error("No contact found for", id);
-    Object.assign(contact, updates);
-    await set(contacts);
-    return contact;
+    let schedules = await localforage.getItem("schedules");
+    let schedule = schedules.find(schedule => schedule.idShiftSchedule === id);
+    if (!schedule) throw new Error("No schedule found for ", id);
+    Object.assign(schedule, updates);
+    await set(schedules);
+    return schedule;
 }
 
 export async function deleteContact(id) {

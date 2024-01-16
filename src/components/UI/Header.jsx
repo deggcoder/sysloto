@@ -1,6 +1,7 @@
 import React from 'react'
 import { MenuButton } from './MenuButton'
 import { UserProfile } from './UserProfile'
+import { NavLink } from 'react-router-dom'
 
 export const Header = ({ title = 'Logotipo', schedule }) => {
     return (
@@ -20,13 +21,13 @@ export const Header = ({ title = 'Logotipo', schedule }) => {
                         {schedule ? schedule.name : 'Fuera de turno'}
                     </p>
                 </div>
-                <a 
+                <NavLink
                     className='material-symbols-outlined
                         p-2 hover:bg-surface-container-high rounded-full'
-                    href="#"
+                    to={'sysloto/u/1/settings'}
                 >
                     settings
-                </a>
+                </NavLink>
                 <UserProfile />
             </div>
         </header>
