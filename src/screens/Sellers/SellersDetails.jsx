@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, redirect, useLoaderData } from "react-router-dom";
 import { IconUser, SellersDetailsList, formaterDate, timeFormater } from "../../components";
 import { createDetail, getSalesDetails } from "../../data";
 
@@ -13,8 +13,17 @@ export async function detailsAction({ request, params }) {
     const formData = await request.formData();
     const newDetail = Object.fromEntries(formData);
     
-    const detail = await createDetail(idTicket, newDetail.number, parseInt(newDetail.price));
-    return { detail };
+    const response = await createDetail(idTicket, newDetail.number, parseInt(newDetail.price));
+
+    if(response.errMsg) {
+        alert(
+            response.errMsg
+        );
+        return redirect(`/vendedor/${params.sellerId}/turno/${params.scheduleId}/ventas/${idTicket}`);
+    } 
+
+    const {ok} = response;
+    return { ok };
 }
 
 export const ScreensSellersDetails = () => {
@@ -75,19 +84,21 @@ export const ScreensSellersDetails = () => {
                             <input
                                 type="text"
                                 autoFocus
-                                
                                 name="number"
                                 id="number"
                                 placeholder="Número"
                                 className="text-body-large text-on-surface-variant px-4.5 py-2
                                     rounded-full items-center bg-transparent border border-outline
                                     placeholder:text-outline w-min
-                                    outline-none ring-primary ring-inset focus-within:ring-2 focus-within:border-transparent"
+                                    outline-none ring-primary ring-inset focus-within:ring-2 
+                                    focus-within:border-transparent"
+                                maxLength={2}
+                                size={2}
                             />
                             <input
                                 type="text"
                                 name="price"
-                                id="number"
+                                id="price"
                                 placeholder="Monto"
                                 className="text-body-large text-on-surface-variant px-4.5 py-2
                                     rounded-full items-center bg-transparent border border-outline

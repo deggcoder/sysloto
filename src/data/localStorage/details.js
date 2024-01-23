@@ -1,10 +1,10 @@
 import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
+import { getNumberList, isAvailableToSell } from "./numbers";
 import { getNumbersBySchedule, getTicket, getTickets, isSameDay } from "./sales";
 import { getSeller, getSellers } from "./sellers";
 import { getShiftSchedule } from "./shiftSchedules";
-import { getNumberList } from "./numbers";
 
 export async function getLastId() {
     await fakeNetwork();
@@ -230,10 +230,14 @@ export async function getDetailsByTicket(sale_id) {
 }
 
 export async function createDetail(idTicket, number, price) {
-    await fakeNetwork();
+    const response = new Object(null);
 
+    await fakeNetwork();
+    
     const ticket = await getTicket(idTicket);
     const seller = await getSeller(ticket.idSeller);
+
+    const available = await isAvailableToSell(number, ticket.idShiftSchedule, price);
 
     let detail = { idTicket, number, price, factor: seller.factor * price };
     let details = await getAll();
@@ -247,18 +251,36 @@ export async function createDetail(idTicket, number, price) {
     const target = details.find(data => comparison(data));
 
     if (target) {
-        details = details.map(data => {
-            if (comparison(data)) {
-                data.price += price;
-            }
-            return data;
-        });
+        if(available.errMsg) {
+            response.errMsg = available.errMsg;
+            response.ok = {};
+            return response;
+        } else {
+            details = details.map(data => {
+                if (comparison(data)) {
+                    data.price += detail.price;
+                    data.factor += detail.factor;
+                }
+                return data;
+            });
+        }
     } else {
-        details.unshift(detail);
+        if(available.errMsg) {
+            response.errMsg = available.errMsg;
+            response.ok = {};
+            return response;
+        } else {
+            details.unshift(detail);
+        }
     }
 
+
     await set(details);
-    return detail;
+
+    response.ok = detail;
+    response.errMsg = "";
+
+    return response;
 }
 
 export async function getDetial(id) {

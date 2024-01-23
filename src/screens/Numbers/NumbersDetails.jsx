@@ -1,10 +1,9 @@
-import { NumbersDetailsList, ResumeWidget } from "../../components";
-import { getDetailOfNumber, getSchedules, getSellers } from "../../data";
 import { useLoaderData } from "react-router-dom";
+import { NumbersDetailsList, ResumeWidget } from "../../components";
+import { getDetailOfNumber, getSchedules } from "../../data";
 
 export async function numberDetailLoader({ request, params }) {
     // const url = new URL(request.url);
-    // const vendedor = url.searchParams.get("vendedor");
 
     const shiftSchedules = await getSchedules();
     const response = await getDetailOfNumber(params.numberId, parseInt(params.scheduleId));

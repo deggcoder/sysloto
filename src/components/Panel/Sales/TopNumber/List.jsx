@@ -1,8 +1,9 @@
-export const PanelSalesList = ({ list }) => {
+
+export const PanelTopNumberList = ({ list = [] }) => {
 
     const listItems = list.map(item => (
         <li
-            key={item.idWinner}
+            key={item.number}
             className="flex justify-between rounded-2xl p-3.5
           bg-surface-container"
         >
@@ -10,9 +11,6 @@ export const PanelSalesList = ({ list }) => {
                 {item.number}
             </h2>
             <div className="flex flex-col gap-2 items-end">
-                <p className="text-label-large py-1 px-3 rounded-full bg-surface-container-high">
-                    {item.schedule}
-                </p>
                 <p className="text-label-large text-primary">
                     C$ {item.total}
                 </p>
@@ -21,10 +19,12 @@ export const PanelSalesList = ({ list }) => {
     ));
 
     return (
-        <div className="flex flex-col px-4.5 gap-3.5 flex-1 overflow-auto">
-            <h5 className='relative text-body-large'>
-                Números ganadores
-            </h5>
+        <div className="flex flex-col gap-3.5 px-4.5 overflow-auto">
+            <div className="flex justify-between items-center py-1">
+                <h5 className='relative text-body-large'>
+                    Ventas totales
+                </h5>
+            </div>
             <ul className="flex flex-col gap-2">{listItems}</ul>
         </div>
     )

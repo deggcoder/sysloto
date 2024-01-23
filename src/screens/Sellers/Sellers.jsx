@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Outlet, useLoaderData, redirect, Navigate, useParams} from "react-router-dom";
+import { Form, Navigate, Outlet, redirect, useLoaderData, useParams } from "react-router-dom";
 import {
     SellersControlPanelList,
     SellersControlPanelNavBar,
@@ -11,14 +11,15 @@ import { createTicket, getSales, getSchedules, sellerMenu } from '../../data';
 export async function salesLoader({ request, params }) {
     const url = new URL(request.url);
     const q = url.searchParams.get("q");
+    const p = url.searchParams.get("period");
 
     let idSeller = parseInt(params.sellerId);
     let idSchedule = parseInt(params.scheduleId);
 
-    const response = await getSales(idSchedule, idSeller, q);
+    const response = await getSales(idSchedule, idSeller, q, p);
     const shiftSchedules = await getSchedules();
 
-    return { schedules: shiftSchedules, response, q };
+    return { schedules: shiftSchedules, response, q, p};
 }
 
 export async function salesAction({ params }) {
@@ -38,7 +39,7 @@ export async function salesAction({ params }) {
 }
 
 export const ScreensSellers = () => {
-    const { response, schedules, q } = useLoaderData();
+    const { response, schedules, q, p } = useLoaderData();
 
     const {sellerId, scheduleId} = useParams();
 
@@ -88,7 +89,7 @@ export const ScreensSellers = () => {
                 </header>
 
                 {
-                    q 
+                    q || p
                         ? null
                         : tickets.length ?
                         <Navigate to={`/vendedor/${sellerId}/turno/${scheduleId}/ventas/${tickets[0].idTicket}`} replace={true} />

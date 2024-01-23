@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { Header, NavigationDrawer } from '../../components';
+import React, { useEffect, useState } from 'react';
 import { Outlet, useLoaderData, } from "react-router-dom";
+import { Header, NavigationDrawer } from '../../components';
 import { getCurrentSchedule, getSellers } from '../../data';
 
 export async function loadSellers() {
@@ -12,6 +12,7 @@ export async function loadSellers() {
 export const ScreensRoutesRoot = () => {
   const { sellers } = useLoaderData();
   const [schedule, setSchedule] = useState({});
+  const [isOn, setIsOn] = useState(true);
 
   useEffect(() => {
     getCurrentSchedule()
@@ -21,17 +22,31 @@ export const ScreensRoutesRoot = () => {
 
   }, [schedule]);
 
+  function showNavigation() {
+    if(isOn) {
+      setIsOn(false);
+    } else {
+      setIsOn(true);
+    }
+  }
+
   return (
     <>
       <Header
         schedule={schedule}
+        handleClick={showNavigation}
       />
       <div className='flex flex-1 overflow-auto w-full h-full'>
-        <NavigationDrawer
-          sellers={sellers}
-          schedule={schedule}
-        />
-        <main className='flex h-full w-full gap-3.5 pr-3.5'>
+        {
+          isOn
+            ? (
+              <NavigationDrawer
+                sellers={sellers}
+                schedule={schedule}
+              />
+            ) : null
+        }
+        <main className='flex h-full px-4.5 w-full gap-3.5 pr-3.5'>
           <Outlet />
         </main>
       </div>

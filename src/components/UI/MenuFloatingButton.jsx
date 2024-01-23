@@ -45,6 +45,7 @@ export const MenuFloatingButton = ({menu = []}) => {
                 visible
                     ? <Menu
                         menuList={menu}
+                        useSeller={false}
                     />
                     : null
             }

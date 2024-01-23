@@ -1,6 +1,7 @@
 import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
+import { getDetailOfNumber } from "./details";
 
 export async function getAll() {
     await fakeNetwork();
@@ -34,6 +35,29 @@ export async function getNumberList(query) {
     }
     
     return numbers.sort(sortBy("idNumber"));
+}
+
+export async function isAvailableToSell(number, idSchedule, mount) {
+    const response = new Object(null);
+    const {currentSales, maxLimit} = await getDetailOfNumber(number, idSchedule);
+    const available = maxLimit - currentSales;
+
+    if(mount > available) {
+        response.errMsg = `El monto excede a la cantidad disponible para vender: 
+        disponible: ${available}.`;
+        response.ok = {};
+
+        return response;
+    }
+
+    response.ok = {
+        available: available,
+        maxLimit: maxLimit,
+        currentSales: currentSales,
+    };
+    response.errMsg = "";
+
+    return response;
 }
 
 // export async function createShiftSchedule(firstName, lastName, factor) {

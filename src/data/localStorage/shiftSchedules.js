@@ -1,5 +1,4 @@
 import localforage from "localforage";
-import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
 
 export async function getAll() {
@@ -44,9 +43,7 @@ export const getCurrentSchedule = async() => {
 export async function getShiftSchedule(idShiftSchedule) {
     await fakeNetwork(`schedule:${idShiftSchedule}`);
     let schedules = await getSchedules();
-
     let schedule = schedules.find(schedule => schedule.idShiftSchedule === idShiftSchedule);
-    
     return schedule ?? null;
 }
 
@@ -91,14 +88,6 @@ async function fakeNetwork(key) {
     return new Promise(res => {
         setTimeout(res, Math.random() * 0);
     });
-}
-
-// classes
-class Seller {
-    constructor(firstName, lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
 }
 
 const shiftSchedules = [

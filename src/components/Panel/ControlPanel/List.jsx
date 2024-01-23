@@ -36,6 +36,6 @@ export const PanelControlPanelList = () => {
 
 const options = [
   { id: 1, title: 'Ventas', description: 'Recopilación de las ventas totales hechas en un periodo', path: 'ventas' },
-  { id: 2, title: 'Racha de vendedores', description: 'Obten información sobre la recha de ventas de tus vendedores', path: '/' },
-  { id: 3, title: 'Racha de números', description: 'Obten información sobre los números más vendidos', path: '/' },
+  { id: 2, title: 'Racha de vendedores', description: 'Obten información sobre la recha de ventas de tus vendedores', path: 'v/racha' },
+  { id: 3, title: 'Racha de números', description: 'Obten información sobre los números más vendidos', path: 'n/racha' },
 ];

@@ -1,8 +1,8 @@
 export const periodMenu = [
-    {id: 1, label: 'Hoy', link: '?period='},
-    {id: 2, label: 'Ayer', link: '?period='},
-    {id: 3, label: 'Esta semana', link: '?period='},
-    {id: 4, label: 'Este mes', link: '?period='},
+    {id: 1, label: 'Hoy', link: '?period=', param: "hoy"},
+    {id: 2, label: 'Ayer', link: '?period=', param: "ayer"},
+    {id: 3, label: 'Esta semana', link: '?period=', param: "semana"},
+    {id: 4, label: 'Este mes', link: '?period=', param: "mes"},
 ];
 
 export const sellerMenu = [

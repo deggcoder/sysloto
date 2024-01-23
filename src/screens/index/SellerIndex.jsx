@@ -1,4 +1,4 @@
-export const SellerIndex = ({label = 'Detalle de ticket'}) => {
+export const SellerIndex = ({label = 'Detalle de ticket', detail = "Selecciona un boleto para visualizar el detalle"}) => {
     return (
         <section
             className="flex flex-col overflow-auto gap-3.5 bg-surface-container-low
@@ -13,7 +13,7 @@ export const SellerIndex = ({label = 'Detalle de ticket'}) => {
                 <p
                     className="text-title-large"
                 >
-                    Selecciona un boleto para visualizar el detalle
+                    {detail}
                 </p>
             </div>
             <div

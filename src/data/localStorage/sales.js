@@ -1,9 +1,10 @@
 import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
-import { getCurrentSchedule, getSchedules, getShiftSchedule } from "./shiftSchedules";
-import { getSeller, getSellers } from "./sellers";
 import { getDetailsByTicket, getDetailsByTickets } from "./details";
+import { getSeller, getSellers } from "./sellers";
+import { getCurrentSchedule, getSchedules, getShiftSchedule } from "./shiftSchedules";
+import { getWinners, summaryWins } from "./winners";
 
 export async function getLastId() {
     await fakeNetwork();
@@ -12,18 +13,81 @@ export async function getLastId() {
     return sales ? sales.length : 0;
 }
 
-export async function getTickets(idSchedule, idSeller, query) {
+export async function getTickets(idSchedule, idSeller, query, p) {
     await fakeNetwork(`getTickets:${idSchedule},${idSeller}`);
     let tickets = await localforage.getItem("tickets");
 
     if (!tickets) tickets = [];
     if (idSchedule && idSeller) {
-        tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
-            && (ticket.idSeller == idSeller)
-            && isSameDay(ticket.date));
-    } else if(idSchedule) {
-        tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
-            && isSameDay(ticket.date));
+        if (p) {
+            switch (p) {
+                case "hoy":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && (ticket.idSeller == idSeller)
+                        && isSameDay(ticket.date));
+                    break;
+
+                case "ayer":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && (ticket.idSeller == idSeller)
+                        && isYesterday(ticket.date));
+                    break;
+
+                case "semana":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && (ticket.idSeller == idSeller)
+                        && isSameWeek(ticket.date));
+                    break;
+
+                case "mes":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && (ticket.idSeller == idSeller)
+                        && isSameMonth(ticket.date));
+                    break;
+
+                default:
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && (ticket.idSeller == idSeller)
+                        && isSameDay(ticket.date));
+                    break;
+            }
+        } else {
+            tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                && (ticket.idSeller == idSeller)
+                && isSameDay(ticket.date));
+        }
+    } else if (idSchedule) {
+        if (p) {
+            switch (p) {
+                case "hoy":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && isSameDay(ticket.date));
+                    break;
+
+                case "ayer":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && isYesterday(ticket.date));
+                    break;
+
+                case "semana":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && isSameWeek(ticket.date));
+                    break;
+
+                case "mes":
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && isSameMonth(ticket.date));
+                    break;
+
+                default:
+                    tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                        && isSameDay(ticket.date));
+                    break;
+            }
+        } else {
+            tickets = tickets.filter(ticket => (ticket.idShiftSchedule == idSchedule)
+                && isSameDay(ticket.date));
+        }
     }
     return tickets.sort(sortBy("date"));
 }
@@ -139,11 +203,11 @@ export async function getSalesDetails(sale_id) {
     return response;
 }
 
-export async function getSales(idSchedule, idSeller, query) {
+export async function getSales(idSchedule, idSeller, query, p) {
     const response = Object.create(null);
-    const [{ name }] = await getSchedules(idSchedule);
+    const { name } = await getShiftSchedule(idSchedule);
     const seller = await getSeller(idSeller);
-    const tickets = await getTickets(idSchedule, idSeller);
+    const tickets = await getTickets(idSchedule, idSeller, query, p);
 
     const ids = tickets.map(t => t.idTicket);
 
@@ -197,6 +261,110 @@ export async function createTicket(idShiftSchedule, idSeller) {
     return response;
 }
 
+export async function getSummary(p) {
+    await fakeNetwork(`getSummary:${p}`);
+    let tickets = await localforage.getItem("tickets");
+    let winners = await getWinners();
+
+    let response = new Object(null);
+
+    if (!tickets) tickets = [];
+
+    switch (p) {
+        case "hoy":
+            tickets = tickets.filter(ticket => isSameDay(ticket.date));
+            winners = winners.filter(winner => isSameDay(winner.winDate));
+            break;
+
+        case "ayer":
+            tickets = tickets.filter(ticket => isYesterday(ticket.date));
+            winners = winners.filter(winner => isYesterday(winner.winDate));
+            break;
+
+        case "semana":
+            tickets = tickets.filter(ticket => isSameWeek(ticket.date));
+            winners = winners.filter(winner => isSameWeek(winner.winDate));
+            break;
+
+        case "mes":
+            tickets = tickets.filter(ticket => isSameMonth(ticket.date));
+            winners = winners.filter(winner => isSameMonth(winner.winDate));
+            break;
+
+        default:
+            tickets = tickets.filter(ticket => isSameDay(ticket.date));
+            winners = winners.filter(winner => isSameDay(winner.winDate));
+            break;
+    }
+
+    const ids = tickets.map(t => t.idTicket);
+    let salesBySeller = tickets.reduce((acc, ticket) => {
+        const {idSeller} = ticket;
+        acc[idSeller] = acc[idSeller] || [];
+        acc[idSeller].push(ticket);
+        return acc;
+    }, []);
+
+    let result = [];
+
+    for (const key of Object.keys(salesBySeller)) {
+        let seller = await getSeller(key);
+        
+        let obj = new Object(null);
+        let total = 0;
+        let _ids = salesBySeller[key].map(t => t.idTicket);
+
+        let d = await getDetailsByTickets(_ids);
+        total = d.reduce((acc, det) => acc += det.price, 0);
+        
+        obj.idSeller = key;
+        obj.seller = `${seller.firstName} ${seller.lastName}`;
+        obj.total = total;
+
+        result.push(obj);
+    }
+
+    winners = await summaryWins(winners);
+
+    // Get tickets
+    let totalTickets = winners.map(t => t.tickets.length)
+        .reduce((acc, t) => acc += t, 0);
+
+    let wins = winners.map(w => w.winner);
+
+    const details = await getDetailsByTickets(ids);
+
+    let totalByNumbers = details.reduce((acc, n) => {
+        const {number, price} = n;
+        acc[number] = acc[number] || 0;
+        acc[number] += price;
+        return acc;
+    }, {});
+
+    const totalSales = details.reduce((acc, t) => {
+        return acc += t.price;
+    }, 0);
+
+    const totalDisburse = winners.reduce((acc, t) => {
+        return acc += t.winner.total;
+    }, 0);
+
+    result = result.sort(sortBy("-total"));
+    totalByNumbers = Object.entries(totalByNumbers)
+        .map(([number, total], i) => ({number, total, id: i + 1}));
+
+    totalByNumbers = totalByNumbers.sort(sortBy("-total"));
+
+    response.totalSales = totalSales;
+    response.totalDisburse = totalDisburse;
+    response.totalTickets = totalTickets;
+    response.winners = wins;
+    response.sellers = result;
+    response.totalNumbers = totalByNumbers;
+
+    return response;
+}
+
 export async function getTicket(sale_id) {
     await fakeNetwork(`ticket:${sale_id}`);
     let tickets = await localforage.getItem("tickets");
@@ -247,24 +415,6 @@ async function fakeNetwork(key) {
     });
 }
 
-// classes
-class Ticket {
-    constructor(ticketNumber, shiftSchedule, seller) {
-        this.ticketNumber = ticketNumber;
-        this.shiftSchedule = shiftSchedule;
-        this.seller = seller;
-        this.date = new Date();
-    }
-
-    canSave() {
-        if (this.shiftSchedule.isEnable(this.date.getHours())) {
-            return false;
-        }
-
-        return true;
-    }
-}
-
 // util
 export function isSameDay(date) {
     const currentDate = new Date();
@@ -274,6 +424,46 @@ export function isSameDay(date) {
         currentDate.getFullYear() === targetDate.getFullYear() &&
         currentDate.getMonth() === targetDate.getMonth() &&
         currentDate.getDate() === targetDate.getDate()
+    );
+
+    return compare;
+}
+
+export function isYesterday(date) {
+    let currentDate = new Date();
+    const targetDate = new Date(date);
+    currentDate.setDate(currentDate.getDate() - 1);
+
+    const compare = (
+        currentDate.getFullYear() === targetDate.getFullYear() &&
+        currentDate.getMonth() === targetDate.getMonth() &&
+        currentDate.getDate() === targetDate.getDate()
+    );
+
+    return compare;
+}
+
+export function isSameWeek(date) {
+    let currentDate = new Date();
+    const targetDate = new Date(date);
+    currentDate.setDate(currentDate.getDate() - 7);
+
+    const compare = (
+        currentDate.getFullYear() === targetDate.getFullYear() &&
+        currentDate.getMonth() === targetDate.getMonth() &&
+        currentDate.getDate() <= targetDate.getDate()
+    );
+
+    return compare;
+}
+
+export function isSameMonth(date) {
+    let currentDate = new Date();
+    const targetDate = new Date(date);
+
+    const compare = (
+        currentDate.getFullYear() === targetDate.getFullYear() &&
+        currentDate.getMonth() === targetDate.getMonth()
     );
 
     return compare;

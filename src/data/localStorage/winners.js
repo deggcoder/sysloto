@@ -1,9 +1,8 @@
 import localforage from "localforage";
 import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
-import { getSchedules, getShiftSchedule } from "./shiftSchedules";
 import { getNumbersBySchedule, getTicketsByScheduleAndNumber } from "./sales";
-import { getNumbersByTickets } from "./details";
+import { getSchedules, getShiftSchedule } from "./shiftSchedules";
 
 export async function getLastId() {
     await fakeNetwork();
@@ -25,6 +24,17 @@ export async function getWinners(query) {
     return winners.sort(sortBy("winDate"));
 }
 
+export async function summaryWins(array) {
+    let wins = [];
+
+    for (const element of array) {
+        let win = await getWinner(element.idWinner);
+
+        wins.push(win);
+    }
+    return wins;
+}
+
 export async function getWinner(id, query) {
     const response = Object.create(null);
     await fakeNetwork(`winner:${id},${query}`);
@@ -42,7 +52,7 @@ export async function getWinner(id, query) {
         tickets = matchSorter(tickets, query, { keys: ["idSeller"] });
     }
 
-    const total = numbers.reduce((acc, number) => acc + (number.price * number.factor), 0);
+    const total = numbers.reduce((acc, number) => acc + number.factor, 0);
 
     const win = {
         idWinner: winner.idWinner,

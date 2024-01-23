@@ -1,22 +1,22 @@
 import { createBrowserRouter } from "react-router-dom";
-import { ScreensRoutesRoot, loadSellers } from "./Routes";
-import ScreensErrorPage from "./Error/ErrorPage";
-import { ScreensPanel } from "./Panel";
-import { PanelSalesDashboard, action as rootAction } from "../components";
-import { ScreensNumbers, numberDetailLoader, numbersLoader } from "./Numbers";
-import { ScreensNumbersDetails } from "./Numbers";
-import { ScreensDisburses, disbursesLoader } from "./Disburses/Disburses";
-import { ScreensDisbursesDetails, disbursesDLoader } from "./Disburses/DisbursesDetails";
-import { ScreensSellers, salesAction, salesLoader } from "./Sellers/Sellers";
-import { ScreensSellersDetails, detailsAction, detailsLoader } from "./Sellers/SellersDetails";
-import { ScreensSellersEdit, sellerAction, sellerLoader } from "./Sellers/Edit";
-import { destroyAction } from "./Sellers/Destroy";
-import { SellerIndex } from "./index/SellerIndex";
-import { IndexPage } from "./index/IndexPage";
-import { deleteAction } from "./Sellers/Delete";
+import { PanelSalesDashboard, PanelSalesTopSellers, dashboardLoader, action as rootAction, topSellersLoader } from "../components";
+import { PanelSalesTopNumber, topNumberLoader } from "../components/Panel/Sales/TopNumber";
 import { createAction } from "./Disburses/Create";
 import { deleteDisburseAction } from "./Disburses/Delete";
+import { ScreensDisburses, disbursesLoader } from "./Disburses/Disburses";
+import { ScreensDisbursesDetails, disbursesDLoader } from "./Disburses/DisbursesDetails";
+import ScreensErrorPage from "./Error/ErrorPage";
+import { ScreensNumbers, ScreensNumbersDetails, numberDetailLoader, numbersLoader } from "./Numbers";
+import { ScreensPanel } from "./Panel";
+import { ScreensRoutesRoot, loadSellers } from "./Routes";
+import { deleteAction } from "./Sellers/Delete";
+import { destroyAction } from "./Sellers/Destroy";
+import { ScreensSellersEdit, sellerAction, sellerLoader } from "./Sellers/Edit";
+import { ScreensSellers, salesAction, salesLoader } from "./Sellers/Sellers";
+import { ScreensSellersDetails, detailsAction, detailsLoader } from "./Sellers/SellersDetails";
 import { ScreensSetNumbers, ScreensSetSchdules, ScreensSettingsRoot, setNumbersAction, setNumbersLoader, setScheduleAction, setSchedulesLoader } from "./Settigns";
+import { IndexPage } from "./index/IndexPage";
+import { SellerIndex } from "./index/SellerIndex";
 
 export const router = createBrowserRouter([
     {
@@ -31,10 +31,23 @@ export const router = createBrowserRouter([
                 path: `panel`,
                 element: <ScreensPanel />,
                 children: [
+                    { index: true, element: <SellerIndex 
+                        label="Selleccion" detail="Selleciona una opción y mira el detalle" /> },
                     {
                         path: 'ventas',
-                        element: <PanelSalesDashboard />
-                    }
+                        element: <PanelSalesDashboard />,
+                        loader: dashboardLoader,
+                    },
+                    {
+                        path: "v/racha",
+                        element: <PanelSalesTopSellers />,
+                        loader: topSellersLoader,
+                    },
+                    {
+                        path: "n/racha",
+                        element: <PanelSalesTopNumber />,
+                        loader: topNumberLoader,
+                    },
                 ],
             },
             {

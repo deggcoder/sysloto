@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { MenuFloatingButton } from "../../UI";
 import { periodMenu } from "../../../data";
+import { MenuFloatingButton } from "../../UI";
 
 export const SellersControlPanelList = ({ list = [], total = 0, sellerName = 'Vendedor', schedule = "" }) => {
 

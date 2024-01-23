@@ -1,6 +1,6 @@
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom";
 
-export const Menu = ({ menuList = [{ label: 'Menu Item', link: '#' }] }) => {
+export const Menu = ({ menuList = [{ label: 'Menu Item', link: '#' }], useSeller = true }) => {
     const {sellerId} = useParams();
 
     return (
@@ -14,7 +14,11 @@ export const Menu = ({ menuList = [{ label: 'Menu Item', link: '#' }] }) => {
                         <li key={item.id}
                             className="hover:bg-surface-container-highest flex flex-col">
                             <Link
-                                to={`${item.link + sellerId}`}
+                                to={
+                                    `${useSeller 
+                                        ? item.link + sellerId 
+                                        : item.link + item.param}`
+                                }
                                 className="px-3.5 py-2 flex gap-3.5 items-center"
                             >
                                 {/* <span className="material-symbols-outlined text-secondary">

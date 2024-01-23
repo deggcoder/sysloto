@@ -1,6 +1,8 @@
-import { ExpandedUtilityWidget, LargeUtilityWidget, ResumeWidget } from "../../UI"
+import { ExpandedUtilityWidget, LargeUtilityWidget } from "../../UI"
 
-export const PanelSalesUtilityWidgets = ({ description, positiveAmount, negativeAmount }) => {
+export const PanelSalesUtilityWidgets = ({ 
+    description, positiveAmount, negativeAmount, count 
+}) => {
   return (
     <div className="flex flex-col gap-2 px-4.5">
         <p className="text-body-large">{description}</p>
@@ -19,9 +21,6 @@ export const PanelSalesUtilityWidgets = ({ description, positiveAmount, negative
                 amount={positiveAmount - negativeAmount}
             />
         </div>
-        <ResumeWidget
-            total={120}
-        />
     </div>
   )
 }

@@ -1,11 +1,11 @@
 import { useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { createSeller } from '../../data';
+import { DisbursesForm } from '../Disburses';
 import { SellersForm } from '../Sellers';
 import { FABButton } from './FABButton';
 import { NavLinkItem } from './NavLinkItem';
 import { NavLinkUser } from './NavLinkUser';
-import { createSeller } from '../../data';
-import { useParams } from 'react-router-dom';
-import { DisbursesForm } from '../Disburses';
 
 export async function action({ request, params }) {
     const formData = await request.formData();
@@ -42,7 +42,7 @@ export const NavigationDrawer = ({ sellers, schedule }) => {
                     onClick={openDisburseModal}
                 />
             </div>
-            <nav className='pr-4 flex-1 overflow-auto'>
+            <nav className='flex-1 overflow-auto'>
                 <ul className=''>
                     <NavLinkItem
                         iconName='chart_data'

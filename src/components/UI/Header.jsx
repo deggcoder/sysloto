@@ -1,13 +1,15 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 import { MenuButton } from './MenuButton'
 import { UserProfile } from './UserProfile'
-import { NavLink } from 'react-router-dom'
 
-export const Header = ({ title = 'Logotipo', schedule }) => {
+export const Header = ({ title = 'Logotipo', schedule, handleClick }) => {
     return (
         <header className='flex relative justify-between items-center px-3.5 py-2'>
             <div className='flex gap-2'>
-                <MenuButton />
+                <MenuButton
+                    handleClick={handleClick}
+                />
                 <h1 className='font-display text-4xl'>{title}</h1>
             </div>
             <div className='flex gap-2 items-center'>
