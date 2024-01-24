@@ -4,6 +4,11 @@ import { Menu } from "../UI";
 export const MenuFloatingButton = ({menu = []}) => {
     const [visible, setVisible] = useState(false);
     const buttonRef = useRef(null);
+    const [name, setName] = useState("Hoy");
+
+    function handleChange(param) {
+        setName(param);
+    }
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -21,7 +26,7 @@ export const MenuFloatingButton = ({menu = []}) => {
         return () => {
           document.removeEventListener('click', handleClickOutside);
         };
-      }, []);
+      }, [name]);
 
     const onClickButton = () => {
         setVisible(visible ? false : true);
@@ -36,7 +41,7 @@ export const MenuFloatingButton = ({menu = []}) => {
                 onClick={onClickButton}
                 ref={buttonRef}
             >
-                Hoy
+                {name}
                 <span className="material-symbols-outlined text-secondary">
                     arrow_drop_down
                 </span>
@@ -46,6 +51,7 @@ export const MenuFloatingButton = ({menu = []}) => {
                     ? <Menu
                         menuList={menu}
                         useSeller={false}
+                        handleChange={handleChange}
                     />
                     : null
             }

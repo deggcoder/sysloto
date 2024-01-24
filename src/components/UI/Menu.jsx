@@ -1,6 +1,7 @@
-import { Link, useParams } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 
-export const Menu = ({ menuList = [{ label: 'Menu Item', link: '#' }], useSeller = true }) => {
+export const Menu = ({ menuList = [{ label: 'Menu Item', link: '#' }], useSeller = true,
+    handleChange }) => {
     const {sellerId} = useParams();
 
     return (
@@ -12,8 +13,10 @@ export const Menu = ({ menuList = [{ label: 'Menu Item', link: '#' }], useSeller
                 {
                     menuList.map(item => (
                         <li key={item.id}
-                            className="hover:bg-surface-container-highest flex flex-col">
-                            <Link
+                            className="hover:bg-surface-container-highest flex flex-col"
+                            onClick={()=> handleChange(item.label)}
+                        >
+                            <NavLink
                                 to={
                                     `${useSeller 
                                         ? item.link + sellerId 
@@ -24,10 +27,12 @@ export const Menu = ({ menuList = [{ label: 'Menu Item', link: '#' }], useSeller
                                 {/* <span className="material-symbols-outlined text-secondary">
                                         arrow_drop_down
                                     </span> */}
-                                <span>{item.label}</span>
+                                <span>
+                                    {item.label}
+                                </span>
                                 {/* <span className="material-symbols-outlined text-secondary">
                                     </span> */}
-                            </Link>
+                            </NavLink>
                             {/* <div role="divider" className="py-2 border-b border-outline-variant flex items-center"></div> */}
                         </li>
                     ))

@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { MenuButton } from './MenuButton'
 import { UserProfile } from './UserProfile'
 
-export const Header = ({ title = 'Logotipo', schedule, handleClick }) => {
+export const Header = ({ title = 'Rifa $', schedule, handleClick }) => {
     return (
         <header className='flex relative justify-between items-center px-3.5 py-2'>
             <div className='flex gap-2'>
